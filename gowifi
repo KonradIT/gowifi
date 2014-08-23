@@ -1,0 +1,421 @@
+#!/bin/bash
+hash ffmpeg 2> /dev/null || { echo >&2 "GoWifi requires ffmpeg. Not installed. Install it by running sudo apt-get install ffmpeg";}
+hash curl 2> /dev/null || { echo >&2 "GoWifi requires CURL. Not installed. Install it by running sudo apt-get install curl";}
+hash vlc 2> /dev/null || { echo >&2 "GoWifi requires VLC. Not installed. Install it by running sudo apt-get install vlc";}
+echo "GoWifi - GoPro Wifi command line controller. Type help for help"
+printf "\n"
+echo "Requeriments: ffmpeg, cURL, VLC (sudo apt get install ffmpeg curl vlc)"
+printf "\n"
+cr=$'\r'
+#rm -r -f tmpdir_gowifi
+#mkdir tmpdir_gowifi
+#cd tmpdir_gowifi
+#curl -s -O http://10.5.5.9/bacpac/sd
+#curl --crlf -s -O http://10.5.5.9/bacpac/cv
+#curl --crlf -s -O http://10.5.5.9:8080/videos/MISC/version.txt
+gpname=`curl -s http://10.5.5.9/bacpac/cv | sed 's|[^a-z,A-Z]||g'`
+#sd=`curl http://10.5.5.9/bacpac/sd | sed 's|[^a-z,A-Z,0-9]||g'`
+#echo $sd > sd.txt
+if [[ $gpname == *Black* ]]
+then
+gpname2=GoProHERO3Black
+fi
+if [[ $gpname == *Silver* ]]
+then
+gpname2=GoProHERO3Silver
+fi
+if [[ $gpname == *White* ]]
+then
+gpname2=GoProHERO3White
+fi
+if [[ $gpname == *+Black* ]]
+then
+gpname2=GoProHERO3PlusBlack
+fi
+if [[ $gpname == *+Silver* ]]
+then
+gpname2=GoProHERO3PlusSilver
+fi
+firmware=`curl -s http://10.5.5.9:8080/videos/MISC/version.txt | sed -n '3p' | sed 's|["firmwareversion:,1{ \n ]||g'`
+if [[ $gpname2 == *GoPro* ]]
+then
+echo "camera: $gpname2
+Firmware: $firmware
+status: connected 
+Stablished connection the `date +%D` at `date +%H:%M:%S`"
+else
+zenity --notification --text 'not connected to GoPro camera wifi, please connect and restart GoWifi app'
+fi;
+#echo -ne "Type your GoPro Wifi password: "; read gppassword
+#gppassword="${gppassword%$cr}"
+#gppassword=`cat sd.txt`
+gppassword=`curl -s http://10.5.5.9/bacpac/sd | sed 's|[^a-z,A-Z,0-9]||g'`
+#gppassword="${gppassword%$cr}"
+while true
+do
+echo -ne "$gpname2: "; read param
+if [[ $param == help ]]
+then 
+printf "Supportted commands:\nlive\nturnon\nturnoff\nvideo\nphoto\nburst\ntimelapse\nshutter\nstop\nvideores\nup\ndown\ninterval\nwb\nprotune_on\nprotune_off\nlogcaminfo\nshowcaminfo\nlive_record\nlive_play\n\nMake sure ffmpeg, curl and vlc are installed\n"
+fi
+if [[ $param == live ]]
+then 
+curl -g "http://10.5.5.9/bacpac/PV?t=${gppassword}&p=%00"
+vlc -q http://10.5.5.9:8080/live/amba.m3u8
+fi
+if [[ $param == turnon ]]
+then 
+curl -g "http://10.5.5.9/bacpac/PW?t=${gppassword}&p=%01"
+fi
+if [[ $param == wb ]]
+then
+if [[ $gpname == *Black* ]]
+then
+echo "Choose:
+auto
+3000
+5500
+6500
+camraw
+"
+echo -ne "Type WB value: "; read wbvalue
+fi
+if [[ $wbvalue == auto ]]
+then 
+curl -g "http://10.5.5.9/camera/WB?t=${gppassword}&p=%00"
+fi
+if [[ $wbvalue == 3000 ]]
+then 
+curl -g "http://10.5.5.9/camera/WB?t=${gppassword}&p=%01"
+fi
+if [[ $wbvalue == 5500 ]]
+then 
+curl -g "http://10.5.5.9/camera/WB?t=${gppassword}&p=%02"
+fi
+if [[ $wbvalue == 6500 ]]
+then 
+curl -g "http://10.5.5.9/camera/WB?t=${gppassword}&p=%03"
+fi
+if [[ $wbvalue == camraw ]]
+then 
+curl -g "http://10.5.5.9/camera/WB?t=${gppassword}&p=%04"
+fi
+if [[ $gpname == *Silver* ]]
+then
+echo not supported
+fi
+if [[ $gpname == *White* ]]
+then
+echo not supported
+fi
+if [[ $gpname == *+Black* ]]
+then
+echo "Choose:
+auto
+3000
+5500
+6500
+camraw
+"
+echo -ne "Type WB value: "; read wbvalue
+fi
+if [[ $wbvalue == auto ]]
+then 
+curl -g "http://10.5.5.9/camera/WB?t=${gppassword}&p=%00"
+fi
+if [[ $wbvalue == 3000 ]]
+then 
+curl -g "http://10.5.5.9/camera/WB?t=${gppassword}&p=%01"
+fi
+if [[ $wbvalue == 5500 ]]
+then 
+curl -g "http://10.5.5.9/camera/WB?t=${gppassword}&p=%02"
+fi
+if [[ $wbvalue == 6500 ]]
+then 
+curl -g "http://10.5.5.9/camera/WB?t=${gppassword}&p=%03"
+fi
+if [[ $wbvalue == camraw ]]
+then 
+curl -g "http://10.5.5.9/camera/WB?t=${gppassword}&p=%04"
+fi
+fi
+if [[ $gpname == *+Silver* ]]
+then
+echo not supported
+fi
+if [[ $param == turnoff ]]
+then 
+curl -g "http://10.5.5.9/bacpac/PW?t=${gppassword}&p=%00"
+fi
+if [[ $param == shutter ]]
+then 
+curl -g "http://10.5.5.9/bacpac/SH?t=${gppassword}&p=%01"
+fi
+if [[ $param == video ]]
+then 
+curl -g "http://10.5.5.9/camera/CM?t=${gppassword}&p=%00"
+fi
+if [[ $param == photo ]]
+then 
+curl -g "http://10.5.5.9/camera/CM?t=${gppassword}&p=%01"
+fi
+if [[ $param == burst ]]
+then 
+curl -g "http://10.5.5.9/camera/CM?t=${gppassword}&p=%02"
+fi
+if [[ $param == timelapse ]]
+then 
+curl -g "http://10.5.5.9/camera/CM?t=${gppassword}&p=%03"
+fi
+if [[ $param == stop ]]
+then 
+curl -g "http://10.5.5.9/bacpac/SH?t=${gppassword}&p=%00"
+fi
+if [[ $param == up ]]
+then 
+curl -g "http://10.5.5.9/camera/UP?t=${gppassword}&p=%00"
+fi
+if [[ $param == down ]]
+then 
+curl -g "http://10.5.5.9/camera/UP?t=${gppassword}&p=%01"
+fi
+if [[ $param == protune_on ]]
+then 
+curl -g "http://10.5.5.9/camera/PT?t=${gppassword}&p=%01"
+fi
+if [[ $param == protune_off ]]
+then 
+curl -g "http://10.5.5.9/camera/PT?t=${gppassword}&p=%01"
+fi
+if [[ $param == interval ]]
+then 
+echo -ne "Intervals:
+0-5
+1
+2
+5
+10
+30
+60
+" 
+echo -ne "type the interval: "; read intervalvalue
+fi
+if [[ $intervalvalue == 0-5 ]]
+then
+curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%00"
+fi
+if [[ $intervalvalue == 1 ]]
+then
+curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%01"
+fi
+if [[ $intervalvalue == 5 ]]
+then
+curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%05"
+fi
+if [[ $intervalvalue == 10 ]]
+then
+curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%0a"
+fi
+if [[ $intervalvalue == 30 ]]
+then
+curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%1e"
+fi
+if [[ $intervalvalue == 60 ]]
+then
+curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%3c"
+fi
+if [[ $param == videores ]]
+then 
+if [[ $gpname == *Black* ]]
+then
+echo -ne "Resolutions available:
+4kCin12
+2-7kCin24
+4k15
+1440p40
+1080p60
+720p120
+WVGA240
+" 
+echo -ne "type the resolution: "; read videoresvalue
+if [[ $videoresvalue == 4kCin12 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%08"
+fi
+if [[ $videoresvalue == 2-7kCin12 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%07"
+fi
+if [[ $videoresvalue == 4k15 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%06"
+fi
+if [[ $videoresvalue == 1440p40 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%04"
+fi
+if [[ $videoresvalue == 1080p60 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%03"
+fi
+if [[ $videoresvalue == 720p120 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%02"
+fi
+if [[ $videoresvalue == WVGA120 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%01"
+fi
+fi
+if [[ $gpname == *Silver*,*HERO2* ]]
+then
+echo -ne "Resolutions available:
+1080p30
+960p48
+960p30
+720p60
+720p30
+WVGA120
+WVGA60
+" 
+echo -ne "type the resolution: "; read videoresvalue
+if [[ $videoresvalue == WVGA60 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%00"
+fi
+if [[ $videoresvalue == WVGA120 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%01"
+fi
+if [[ $videoresvalue == 720p30 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%02"
+fi
+if [[ $videoresvalue == 720p60 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%03"
+fi
+if [[ $videoresvalue == 960p30 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%04"
+fi
+if [[ $videoresvalue == 960p48 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%05"
+fi
+if [[ $videoresvalue == 1080p30 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%06"
+fi
+fi
+if [[ $gpname == *White* ]]
+then
+echo "Your camera is a HERO3 White edition, at the moment GoWifi does not support white edition camera because I dont have it, email me for help: mail at chernowii dot com"
+fi
+if [[ $gpname == *+Black* ]]
+then
+echo -ne "Resolutions available:
+4k
+4k17-9
+4k15
+4k12
+2k
+2-7k
+2-7k24
+2-7k30
+1440p
+1440p48
+1080pSV
+1080p
+960p
+720pSV
+720p
+" 
+echo -ne "type the resolution: "; read videoresvalue
+if [[ $videoresvalue == 4k ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%06"
+fi
+if [[ $videoresvalue == 4k17-9 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%08"
+fi
+if [[ $videoresvalue == 4k15 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%01"
+fi
+if [[ $videoresvalue == 4k12 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%00"
+fi
+if [[ $videoresvalue == 2k ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%07"
+fi
+if [[ $videoresvalue == 2-7k ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%05"
+fi
+if [[ $videoresvalue == 2-7k24 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%02"
+fi
+if [[ $videoresvalue == 2-7k30 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%04"
+fi
+if [[ $videoresvalue == 1440p ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%04"
+fi
+if [[ $videoresvalue == 1440p48 ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%05"
+fi
+if [[ $videoresvalue == 1080pSV ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%09"
+fi
+if [[ $videoresvalue == 1080p ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%03"
+fi
+if [[ $videoresvalue == 960p ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%02"
+fi
+if [[ $videoresvalue == 720pSV ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%0a"
+fi
+if [[ $videoresvalue == 720p ]]
+then
+curl -g "http://10.5.5.9/camera/VV?t=${gppassword}&p=%01"
+fi
+fi
+if [[ $gpname == *+Silver* ]]
+then
+echo "Your camera is a HERO3+ Silver editionm at the moment GoWifi does not support plus silver edition camera because I dont have it, email me for help: mail at chernowii dot com"
+fi
+fi
+if [[ $param == logcaminfo ]]
+then
+printf "camera: $gpname2\nfirmware: $firmware\ndate+time of the connection: `date +%D` `date +%H:%M:%S`\n" > goprolog.txt
+fi
+if [[ $param == showcaminfo ]]
+then 
+printf "camera: $gpname2\n firmware: $firmware\n date+time of the connection: `date +%D` `date +%H:%M:%S`\n"
+fi
+if [[ $param == live_record ]]
+then 
+echo -ne "Output file to write (specify file extension), file will be written to tmpdir_gowifi folder: "; 
+read livefile
+ffmpeg -loglevel quiet -i http://10.5.5.9:8080/live/amba.m3u8 $livefile
+fi
+if [[ $param == live_play ]]
+then 
+vlc $livefile
+fi
+done
+
