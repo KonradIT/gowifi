@@ -51,6 +51,68 @@ fi;
 #gppassword=`cat sd.txt`
 gppassword=`curl -s http://10.5.5.9/bacpac/sd | sed 's|[^a-z,A-Z,0-9]||g'`
 #gppassword="${gppassword%$cr}"
+#############
+# Functions #
+#############
+function help() {
+printf "Supportted commands:\nlive\nturnon\nturnoff\nvideo\nphoto\nburst\ntimelapse\nshutter\nstop\nvideores\nup\ndown\ninterval\nwb\nprotune_on\nprotune_off\nlogcaminfo\nshowcaminfo\nlive_record\nlive_play\n\nMake sure ffmpeg, curl and vlc are installed\n"; $*
+}
+function live() {
+curl -g "http://10.5.5.9/bacpac/PV?t=${gppassword}&p=%00"; $*
+vlc -q http://10.5.5.9:8080/live/amba.m3u8
+}
+function turnon() {
+curl -g "http://10.5.5.9/bacpac/PW?t=${gppassword}&p=%01"; $*
+}
+function turnoff() { 
+curl -g "http://10.5.5.9/bacpac/PW?t=${gppassword}&p=%00"; $*
+}
+function shutter() { 
+curl -g "http://10.5.5.9/bacpac/SH?t=${gppassword}&p=%01"; $*
+}
+function video() { 
+curl -g "http://10.5.5.9/camera/CM?t=${gppassword}&p=%00"; $*
+}
+function photo() { 
+curl -g "http://10.5.5.9/camera/CM?t=${gppassword}&p=%01"; $*
+}
+function burst() { 
+curl -g "http://10.5.5.9/camera/CM?t=${gppassword}&p=%02"; $*
+}
+function timelapse() { 
+curl -g "http://10.5.5.9/camera/CM?t=${gppassword}&p=%03"; $*
+}
+function stop() { 
+curl -g "http://10.5.5.9/bacpac/SH?t=${gppassword}&p=%00"; $*
+}
+function up() { 
+curl -g "http://10.5.5.9/camera/UP?t=${gppassword}&p=%00"; $*
+}
+function down() { 
+curl -g "http://10.5.5.9/camera/UP?t=${gppassword}&p=%01"; $*
+}
+function protune_on() { 
+curl -g "http://10.5.5.9/camera/PT?t=${gppassword}&p=%01"; $*
+}
+function protune_off() { 
+curl -g "http://10.5.5.9/camera/PT?t=${gppassword}&p=%01"; $*
+}
+function logcaminfo() {
+printf "camera: $gpname2\nfirmware: $firmware\ndate+time of the connection: `date +%D` `date +%H:%M:%S`\n" > goprolog.txt; $*
+}
+function showcaminfo() { 
+printf "camera: $gpname2\nfirmware: $firmware\ndate+time of the connection: `date +%D` `date +%H:%M:%S`\n"; $*
+}
+function live_record() { 
+echo -ne "Output file to write (specify file extension), file will be written to current cd folder: "; 
+read livefile
+ffmpeg -loglevel quiet -i http://10.5.5.9:8080/live/amba.m3u8 $livefile
+}
+function live_play() { 
+vlc $livefile
+}
+$@
+#Functions ended here
 while true
 do
 echo -ne "$gpname2: "; read param
