@@ -90,6 +90,9 @@ do
 $0 $*
 done
 }
+function loopshow() {
+echo $0
+}
 function logcaminfo() {
 printf "camera: $gpname2\nfirmware: $firmware\ndate+time of the connection: `date +%D` `date +%H:%M:%S`\n" > goprolog.txt; $*; exit
 }
