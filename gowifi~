@@ -159,29 +159,29 @@ echo not supported
 fi
 }
 function interval() {
-if [[ $* == 0-5 ]]
+if [[ $1 == 0-5 ]]
 then
-curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%00"; $*; exit
+curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%00"; $2; exit
 fi
-if [[ $* == 1 ]]
+if [[ $1 == 1 ]]
 then
-curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%01"; $*; exit
+curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%01"; $2; exit
 fi
-if [[ $* == 5 ]]
+if [[ $1 == 5 ]]
 then
-curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%05"; $*; exit
+curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%05"; $2; exit
 fi
-if [[ $* == 10 ]]
+if [[ $1 == 10 ]]
 then
-curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%0a"; $*; exit
+curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%0a"; $2; exit
 fi
-if [[ $* == 30 ]]
+if [[ $1 == 30 ]]
 then
-curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%1e"; $*; exit
+curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%1e"; $2; exit
 fi
-if [[ $* == 60 ]]
+if [[ $1 == 60 ]]
 then
-curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%3c"; $*; exit
+curl -g "http://10.5.5.9/camera/TI?t=${gppassword}&p=%3c"; $2; exit
 fi
 }
 $@
